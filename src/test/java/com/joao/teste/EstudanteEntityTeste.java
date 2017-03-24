@@ -78,24 +78,38 @@ public class EstudanteEntityTeste {
 		
 		getEntityManager().createNativeQuery("INSERT INTO Estudante VALUES('4', 'João Assis')").executeUpdate();
 		
-		EstudanteEntity estudante = (EstudanteEntity) getEntityManager().createQuery("select e from EstudanteEntity e where e.nome = :nome").setParameter("nome", "João Assis").getSingleResult();
+		EstudanteEntity estudante = (EstudanteEntity) getEntityManager()
+				.createQuery("select e from EstudanteEntity e where e.nome = :nome")
+				.setParameter("nome", "João Assis")
+				.getSingleResult();
 		
 		assertEquals("João Assis", estudante.getNome());
 		
 	}
 	
+	/**
+	 * Teste que valida que um novo estudante foi inserido e teve o seu nome alterado
+	 */
 	@Test
-	public void teste01(){
+	public void insereEditaEstudante(){
 		
-
-		List<EstudanteEntity> estudantes = new ArrayList<EstudanteEntity>();
-		estudantes = (List<EstudanteEntity>) this.getEntityManager().createQuery("select e from EstudanteEntity e").getResultList();
-
-		for (EstudanteEntity e : estudantes){
-			System.out.println("ID: " + e.getId() + " " + e.getNome());
-		}
+		EstudanteEntity novoEstudante = new EstudanteEntity();
+		novoEstudante.setId(5);
+		novoEstudante.setNome("João Assis");
+		getEntityManager().persist(novoEstudante);
 		
-		assertEquals("João", estudantes.get(0).getNome());
+		EstudanteEntity estudanteRecuperado = new EstudanteEntity();
+		estudanteRecuperado = getEntityManager().find(EstudanteEntity.class, 5);
+		
+		assertNotNull(estudanteRecuperado);
+		assertEquals("João Assis", estudanteRecuperado.getNome());
+		
+		estudanteRecuperado.setNome("João da Silva Sauro");
+		getEntityManager().merge(estudanteRecuperado);
+		
+		assertNotEquals("João Assis", estudanteRecuperado.getNome());
+		assertEquals("João da Silva Sauro", estudanteRecuperado.getNome());
+		
 		
 	}
 	
